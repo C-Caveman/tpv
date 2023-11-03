@@ -1,0 +1,100 @@
+#!/bin/sh
+# Tiny Password Vault
+# See LICENSE file for licensing and copyright info.
+HELP_MESSAGE="\
+Tiny Password Vault:
+    Get (-g) a password from a file (-f):
+        tpv -g -f filename
+
+    Add (-a) a password to a file (-f):
+        tpv -a -f filename
+
+    Example password file:
+        loc: website_name
+        pwd: password
+
+        loc: website_name
+        email: billy@example.com
+        pwd: password
+
+    Password file syntax:
+        for: what_this_is_for
+        pwd: password
+        optional: this_is_optional
+        another_one: you_can_just_keep_adding_these
+
+        for: my_website
+        pwd: my_website_password
+
+        ...
+
+    To encrypt/decrypt the entire file yourself:
+        gpg -c path_to_file # Encrypt (will prompt for a password)
+        gpg -d path_to_file # Decrypt (will prompt for a password)
+"
+
+# Handle the arguments: ===============================================
+INVALID_ARGUMENTS=0
+FILENAME=""
+OPTION=""
+ARG_TYPE="option"
+[ "$#" = "0" ] && INVALID_ARGUMENTS=1     # No args, error out.
+[ "$1" = "-h" ] && INVALID_ARGUMENTS=1    # Help option, error out.
+[ "$1" = "-help" ] && INVALID_ARGUMENTS=1 # Help option, error out.
+for i in $@; do
+    [ "$ARG_TYPE" = "file" ] && FILENAME="$i" && ARG_TYPE="option"
+    [ "$i" = "-f" ] && ARG_TYPE="file"
+    [ "$i" = "-g" ] && OPTION="get"
+    [ "$i" = "-a" ] && OPTION="add"
+done
+# Print the help message if arguments are invalid:
+[ "$OPTION"   = "" ] && INVALID_ARGUMENTS=1
+[ "$FILENAME" = "" ] && INVALID_ARGUMENTS=1
+[ "$OPTION" = "get" ] && [ ! -f "$FILENAME" ] && INVALID_ARGUMENTS=1
+[ "$OPTION" = "add" ] && [ "$FILENAME" = "" ] && INVALID_ARGUMENTS=1
+[ "$INVALID_ARGUMENTS" = "1" ] && printf "$HELP_MESSAGE" && exit 1
+#-----------------------------------------------------------------------
+
+# Add a new entry to the file: =========================================
+if [ "$OPTION" = "add" ]; then
+    [ ! -f "$FILENAME" ] && printf "New pwd file: $FILENAME\n" # New file.
+    [ -f "$FILENAME" ] && DATA="$(gpg -d "$FILENAME")" # Decrypt file.
+    printf "New entry:\n"
+    read -p "loc: " NEW_LOC
+    stty -echo && read -p "pwd: " NEW_PWD && stty echo # Don't show the pwd!
+    NEW_FIELDS=""
+    INPUT=""
+    printf '\nField format: <field_name> <field_value>\n(q to quit)\n'
+    while true; do 
+        read -p 'New field: ' INPUT
+        [ "$INPUT" = "q" ] && break
+        NEW_FIELDS="$(printf "$NEW_FIELDS\n$INPUT")"
+    done
+    printf "\n"
+    NEW_ENTRY="$(printf "loc: $NEW_LOC$NEW_FIELDS\npwd: $NEW_PWD")"
+    # Insert the new entry to the encrypted file:
+    DATA="$(printf "$DATA\n\n$NEW_ENTRY")"
+    printf "$DATA" | gpg -c > "$FILENAME"
+fi
+#------------------------------------------------------------------------
+
+# Decrypt the passwords file into DATA, stripped of comments. ===========
+if [ "$OPTION" = "get" ]; then
+    DATA="$(gpg -d "$FILENAME" | sed "/^#/d")"
+
+    # Choose a location to retrieve info from:
+    LOC="$(echo "$DATA" | grep 'loc:' | cut -d ' ' -f 2- | dmenu -l 10)"
+
+    # Select the desired field (username, password, ect).
+    FIELD="$(echo "$DATA" | sed -n "/$LOC/,/^$/p" | cut -d ' ' -f 1 | dmenu -l 5)"
+
+    # Copy the selected field.
+    echo "$DATA" |
+        sed -n "/$LOC/,/^\$/p" |
+        grep "$FIELD" |
+        cut -d ' ' -f 2- |
+        xclip -r -selection 'clipboard'
+fi
+#-------------------------------------------------------------------------
+
+DATA=""
