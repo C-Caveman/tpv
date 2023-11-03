@@ -13,7 +13,8 @@ Install:
     make install
 
 Add a password:
-    # Creates 'filename' if it doesn't yet exist:
+    # Opens menu for adding a new section to a password file:
+    # (will create 'filename' if it does not yet exist)
     tpv -a -f filename
 
 Get a password:
