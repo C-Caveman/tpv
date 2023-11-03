@@ -31,7 +31,7 @@ Format of the encrypted file: (each section must start with 'loc: ')
     pwd: another_website_password
 
 
-If you want to add lots of passwords to an encrypted file:
+To add many passwords quickly:
     # You can decrypt the whole thing:
     gpg -d my_passwords > tmp && mv tmp my_passwords
 

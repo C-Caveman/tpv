@@ -86,4 +86,4 @@ if [ "$OPTION" = "get" ]; then
         xclip -r -selection 'clipboard'
 fi
 #-------------------------------------------------------------------------
-DATA=""
+DATA="" # Make sure the unencrypted text doesn't stick around.
