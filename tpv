@@ -9,7 +9,7 @@ Tiny Password Vault:
     Add (-a) a password to a file (-f):
         tpv -a -f filename
 
-    Example password file:
+    Passwords are stored in this format:
         loc: website_name
         pwd: password
 
@@ -17,22 +17,12 @@ Tiny Password Vault:
         email: billy@example.com
         pwd: password
 
-    Password file syntax:
-        for: what_this_is_for
-        pwd: password
-        optional: this_is_optional
-        another_one: you_can_just_keep_adding_these
-
-        for: my_website
-        pwd: my_website_password
-
         ...
 
     To encrypt/decrypt the entire file yourself:
         gpg -c path_to_file # Encrypt (will prompt for a password)
         gpg -d path_to_file # Decrypt (will prompt for a password)
 "
-
 # Handle the arguments: ===============================================
 INVALID_ARGUMENTS=0
 FILENAME=""
@@ -86,7 +76,7 @@ if [ "$OPTION" = "get" ]; then
     LOC="$(echo "$DATA" | grep 'loc:' | cut -d ' ' -f 2- | dmenu -l 10)"
 
     # Select the desired field (username, password, ect).
-    FIELD="$(echo "$DATA" | sed -n "/$LOC/,/^$/p" | cut -d ' ' -f 1 | dmenu -l 5)"
+    FIELD="$(echo "$DATA" | sed -n "/$LOC/,/^$/p" | tail -n +2 | cut -d ' ' -f 1 | dmenu -l 5)"
 
     # Copy the selected field.
     echo "$DATA" |
@@ -96,5 +86,4 @@ if [ "$OPTION" = "get" ]; then
         xclip -r -selection 'clipboard'
 fi
 #-------------------------------------------------------------------------
-
 DATA=""

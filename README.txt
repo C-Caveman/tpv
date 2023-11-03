@@ -1,10 +1,27 @@
 tpv - Tiny Password Vault
 See LICENSE file for copyright and licensing information.
 
-tpv turns an encrypted text file into a password manager!
+tpv provides a menu for accessing passwords from an encrypted file.
 
-1) Make a text file (my_passwords.txt)
-2) Format it like this:
+Credentials are:
+    -encrypted/decrypted using gpg
+    -selected from using dmenu
+    -copied to the clipboard with xclip
+
+Install:
+    # Gets all dependencies and copies tpv to /usr/bin
+    make install
+
+Add a password:
+    # Creates my_passwords if it doesn't yet exist:
+    tpv -a -f my_passwords
+
+Get a password:
+    # Opens menu for copying the a desired password:
+    tpv -g -f my_passwords
+
+
+Format of the encrypted file: (each section must start with 'loc: ')
 
     loc: name_of_website
     usr: username_for_website
@@ -13,16 +30,14 @@ tpv turns an encrypted text file into a password manager!
     loc: name_of_another_website
     pwd: another_website_password
 
-3) Encrypt the file:
-    gpg -c my_passwords.txt
-    # It will prompt you for a password.
-4) Delete the unencrypted version.
-    rm my_passwords.txt
-5) Now you can access the passwords inside with tpv!
-    tpv my_passwords.txt.gpg
-    # You will get a menu which lets you choose which "loc"
-    # to copy the password from.
 
-Requires dmenu and xclip to work.
-Here's how you get those on Ubuntu:
-    sudo apt install dmenu xclip
+If you want to add lots of passwords to an encrypted file:
+    # You can decrypt the whole thing:
+    gpg -d my_passwords > tmp && mv tmp my_passwords
+
+    # Add to the file with a text editor or your choice:
+    $EDITOR my_passwords.txt
+
+    # Encrypt the file again:
+    gpg -c my_passwords && mv my_passwords.gpg my_passwords
+
