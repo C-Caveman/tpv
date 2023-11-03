@@ -22,24 +22,24 @@ Get a password:
 
 
 Format of the encrypted file:
-    Each section must start with 'loc: '
+    Each section must start with 'for: '
     Each section must end with 'pwd: '
 
-    loc: name_of_website
+    for: name_of_website
     usr: username_for_website
     pwd: password_for_website
 
-    loc: name_of_another_website
+    for: name_of_another_website
     pwd: another_website_password
 
 
 To add many passwords quickly:
     # You can decrypt the whole thing:
-    gpg -d my_passwords > tmp && mv tmp my_passwords
+    tpv -d -f filename
 
     # Add to the file with a text editor or your choice:
-    $EDITOR my_passwords.txt
+    $EDITOR filename
 
     # Encrypt the file again:
-    gpg -c my_passwords && mv my_passwords.gpg my_passwords
+    tpv -c -f filename
 

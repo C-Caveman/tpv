@@ -10,10 +10,10 @@ Tiny Password Vault:
         tpv -a -f filename
 
     Passwords are stored in this format:
-        loc: website_name
+        for: website_name
         pwd: password
 
-        loc: website_name
+        for: website_name
         ...: ...
         ...
         ...: ...
@@ -21,9 +21,9 @@ Tiny Password Vault:
 
         ...
 
-    To encrypt/decrypt the entire file yourself:
-        gpg -c path_to_file # Encrypt (will prompt for a password)
-        gpg -d path_to_file # Decrypt (will prompt for a password)
+    To encrypt/decrypt the entire file:
+        tpv -d -f filename
+        tpv -c -f filename
 "
 # Handle the arguments: ===============================================
 INVALID_ARGUMENTS=0
@@ -38,6 +38,8 @@ for i in $@; do
     [ "$i" = "-f" ] && ARG_TYPE="file"
     [ "$i" = "-g" ] && OPTION="get"
     [ "$i" = "-a" ] && OPTION="add"
+    [ "$i" = "-d" ] && OPTION="decrypt"
+    [ "$i" = "-c" ] && OPTION="encrypt"
 done
 # Print the help message if arguments are invalid:
 [ "$OPTION"   = "" ] && INVALID_ARGUMENTS=1
@@ -47,12 +49,16 @@ done
 [ "$INVALID_ARGUMENTS" = "1" ] && printf "$HELP_MESSAGE" && exit 1
 #-----------------------------------------------------------------------
 
+# Whole file encryption/decryption:
+[ "$OPTION" = "decrypt" ] && gpg -d "$FILENAME" > tmp && mv tmp "$FILENAME" && exit 0
+[ "$OPTION" = "encrypt" ] && gpg -c "$FILENAME" && mv "$FILENAME.gpg" "$FILENAME" && exit 0
+
 # Add a new entry to the file: =========================================
 if [ "$OPTION" = "add" ]; then
     [ ! -f "$FILENAME" ] && printf "New pwd file: $FILENAME\n" # New file.
     [ -f "$FILENAME" ] && DATA="$(gpg -d "$FILENAME")" # Decrypt file.
     printf "New entry:\n"
-    read -p "loc: " NEW_LOC
+    read -p "for: " NEW_FOR
     stty -echo && read -p "pwd: " NEW_PWD && stty echo # Don't show the pwd!
     NEW_FIELDS=""
     INPUT=""
@@ -63,7 +69,7 @@ if [ "$OPTION" = "add" ]; then
         NEW_FIELDS="$(printf "$NEW_FIELDS\n$INPUT")"
     done
     printf "\n"
-    NEW_ENTRY="$(printf "loc: $NEW_LOC$NEW_FIELDS\npwd: $NEW_PWD")"
+    NEW_ENTRY="$(printf "for: $NEW_FOR$NEW_FIELDS\npwd: $NEW_PWD")"
     # Insert the new entry to the encrypted file:
     DATA="$(printf "$DATA\n\n$NEW_ENTRY")"
     printf "$DATA" | gpg -c > "$FILENAME"
@@ -74,15 +80,15 @@ fi
 if [ "$OPTION" = "get" ]; then
     DATA="$(gpg -d "$FILENAME" | sed "/^#/d")"
 
-    # Choose a location to retrieve info from:
-    SECTION="$(echo "$DATA" | grep 'loc:' | cut -d ' ' -f 2- | dmenu -l 20)"
+    # Choose a foration to retrieve info from:
+    SECTION="$(echo "$DATA" | grep '^for:' | cut -d ' ' -f 2- | dmenu -l 20)"
 
     # Select the desired field (username, password, ect).
-    FIELD="$(echo "$DATA" | sed -n "/loc: $SECTION/,/^pwd: /p" | tail -n +2 | cut -d ' ' -f 1 | dmenu -l 20)"
+    FIELD="$(echo "$DATA" | sed -n "/^for: $SECTION/,/^pwd: /p" | tail -n +2 | cut -d ' ' -f 1 | dmenu -l 20)"
 
     # Copy the selected field.
     echo "$DATA" |
-        sed -n "/loc: $SECTION/,/^pwd: /p" |
+        sed -n "/^for: $SECTION/,/^pwd: /p" |
         grep "$FIELD" |
         cut -d ' ' -f 2- |
         xclip -r -selection 'clipboard'
