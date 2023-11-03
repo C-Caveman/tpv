@@ -1,7 +1,7 @@
 tpv - Tiny Password Vault
 See LICENSE file for copyright and licensing information.
 
-tpv provides a menu for accessing passwords from an encrypted file.
+Provides a menu for accessing passwords from an encrypted file.
 
 Credentials are:
     -encrypted/decrypted using gpg
@@ -9,16 +9,16 @@ Credentials are:
     -copied to the clipboard with xclip
 
 Install:
-    # Gets all dependencies and copies tpv to /usr/bin
+    # Get all dependencies and copy tpv to /usr/bin
     make install
 
 Add a password:
-    # Creates my_passwords if it doesn't yet exist:
-    tpv -a -f my_passwords
+    # Creates 'filename' if it doesn't yet exist:
+    tpv -a -f filename
 
 Get a password:
     # Opens menu for copying the a desired password:
-    tpv -g -f my_passwords
+    tpv -g -f filename
 
 
 Format of the encrypted file:
