@@ -21,7 +21,9 @@ Get a password:
     tpv -g -f my_passwords
 
 
-Format of the encrypted file: (each section must start with 'loc: ')
+Format of the encrypted file:
+    Each section must start with 'loc: '
+    Each section must end with 'pwd: '
 
     loc: name_of_website
     usr: username_for_website

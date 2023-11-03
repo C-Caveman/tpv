@@ -14,7 +14,9 @@ Tiny Password Vault:
         pwd: password
 
         loc: website_name
-        email: billy@example.com
+        ...: ...
+        ...
+        ...: ...
         pwd: password
 
         ...
@@ -73,17 +75,19 @@ if [ "$OPTION" = "get" ]; then
     DATA="$(gpg -d "$FILENAME" | sed "/^#/d")"
 
     # Choose a location to retrieve info from:
-    LOC="$(echo "$DATA" | grep 'loc:' | cut -d ' ' -f 2- | dmenu -l 10)"
+    SECTION="$(echo "$DATA" | grep 'loc:' | cut -d ' ' -f 2- | dmenu -l 20)"
 
     # Select the desired field (username, password, ect).
-    FIELD="$(echo "$DATA" | sed -n "/$LOC/,/^$/p" | tail -n +2 | cut -d ' ' -f 1 | dmenu -l 5)"
+    FIELD="$(echo "$DATA" | sed -n "/loc: $SECTION/,/^pwd: /p" | tail -n +2 | cut -d ' ' -f 1 | dmenu -l 20)"
 
     # Copy the selected field.
     echo "$DATA" |
-        sed -n "/$LOC/,/^\$/p" |
+        sed -n "/loc: $SECTION/,/^pwd: /p" |
         grep "$FIELD" |
         cut -d ' ' -f 2- |
         xclip -r -selection 'clipboard'
 fi
 #-------------------------------------------------------------------------
 DATA="" # Make sure the unencrypted text doesn't stick around.
+FIELD=""
+SECTION=""
