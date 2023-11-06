@@ -11,9 +11,9 @@ Tiny Password Vault:
 
     Passwords are stored in this format:
         for: website_name
-        pwd my_password
+        pass my_password
         ...
-        and_so_on and_so_forth
+        flavor pie_flavor
 
         for: <section name>
         <field name> <value name>
@@ -60,7 +60,7 @@ if [ "$OPTION" = "add" ]; then
     [ -f "$FILENAME" ] && DATA="$(gpg -d "$FILENAME")" # Decrypt file.
     printf "New entry:\n"
     read -p "for: " NEW_FOR
-    stty -echo && read -p "pwd: " NEW_PWD && stty echo # Don't show the pwd!
+    stty -echo && read -p "password: " NEW_PWD && stty echo # Don't show the pwd!
     NEW_FIELDS=""
     INPUT=""
     printf '\nField format: <field_name> <field_value>\n(q to quit)\n'
@@ -70,7 +70,7 @@ if [ "$OPTION" = "add" ]; then
         NEW_FIELDS="$(printf "$NEW_FIELDS\n$INPUT")"
     done
     printf "\n"
-    NEW_ENTRY="$(printf "for: $NEW_FOR$NEW_FIELDS\npwd: $NEW_PWD")"
+    NEW_ENTRY="$(printf "for: $NEW_FOR$NEW_FIELDS\npass $NEW_PWD")"
     # Insert the new entry to the encrypted file:
     DATA="$(printf "$DATA\n\n$NEW_ENTRY")"
     printf "$DATA" | gpg -c > "$FILENAME"

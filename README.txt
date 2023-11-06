@@ -26,8 +26,9 @@ Format of the encrypted file:
     Each section must start with 'for: '
 
     for: name_of_website
-    username username_for_website
-    password password_for_website
+    name username_for_website
+    pass password_for_website
+    hmmm add_as_many_fields_as_you_want
 
     for: <section name>
     <field name> <value name>
