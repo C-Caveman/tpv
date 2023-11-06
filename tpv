@@ -11,13 +11,14 @@ Tiny Password Vault:
 
     Passwords are stored in this format:
         for: website_name
-        pwd: password
-
-        for: website_name
-        ...: ...
+        pwd my_password
         ...
-        ...: ...
-        pwd: password
+        and_so_on and_so_forth
+
+        for: <section name>
+        <field name> <value name>
+        ...
+        <field name> <value name>
 
         ...
 

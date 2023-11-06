@@ -24,21 +24,22 @@ Get a password:
 
 Format of the encrypted file:
     Each section must start with 'for: '
-    Each section must end with 'pwd: '
 
     for: name_of_website
-    usr: username_for_website
-    pwd: password_for_website
+    username username_for_website
+    password password_for_website
 
-    for: name_of_another_website
-    pwd: another_website_password
+    for: <section name>
+    <field name> <value name>
+    ...
+    <field name> <value name>
 
 
-To add many passwords quickly:
+To add/edit many passwords quickly:
     # You can decrypt the whole thing:
     tpv -d -f filename
 
-    # Add to the file with a text editor or your choice:
+    # Edit the file with a text editor or your choice:
     $EDITOR filename
 
     # Encrypt the file again:
