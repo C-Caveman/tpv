@@ -79,16 +79,15 @@ fi
 # Decrypt the passwords file into DATA, stripped of comments. ===========
 if [ "$OPTION" = "get" ]; then
     DATA="$(gpg -d "$FILENAME" | sed "/^#/d")"
-
-    # Choose a foration to retrieve info from:
+    # Choose a section to retrieve info from:
     SECTION="$(echo "$DATA" | grep '^for:' | cut -d ' ' -f 2- | dmenu -l 20)"
-
+    SECTION_START="$(echo "$DATA" | grep -n "for: $SECTION" | cut -d ':' -f1 | head -n 1)"
     # Select the desired field (username, password, ect).
-    FIELD="$(echo "$DATA" | sed -n "/^for: $SECTION/,/^pwd: /p" | tail -n +2 | cut -d ' ' -f 1 | dmenu -l 20)"
+    FIELD="$(echo "$DATA" | sed -n "$SECTION_START,/^pwd: /p" | tail -n +2 | cut -d ' ' -f 1 | dmenu -l 20)"
 
     # Copy the selected field.
     echo "$DATA" |
-        sed -n "/^for: $SECTION/,/^pwd: /p" |
+        sed -n "$SECTION_START,/^pwd: /p" |
         grep "$FIELD" |
         cut -d ' ' -f 2- |
         xclip -r -selection 'clipboard'
