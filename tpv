@@ -3,11 +3,10 @@
 # See LICENSE file for licensing and copyright info.
 HELP_MESSAGE="\
 Tiny Password Vault:
-    Get (-g) a password from a file (-f):
-        tpv -g -f filename
-
-    Add (-a) a password to a file (-f):
-        tpv -a -f filename
+    Get (-g) a cred: tpv -g <filename>
+    Add (-a) a cred: tpv -a <filename>
+    Encrypt file:    tpv -c <filename>
+    Decrypt file:    tpv -d <filename>
 
     Passwords are stored in this format:
         for: website_name
@@ -19,12 +18,6 @@ Tiny Password Vault:
         <field name> <value name>
         ...
         <field name> <value name>
-
-        ...
-
-    To encrypt/decrypt the entire file:
-        tpv -d -f filename
-        tpv -c -f filename
 "
 # Handle the arguments: ===============================================
 INVALID_ARGUMENTS=0
@@ -36,11 +29,10 @@ ARG_TYPE="option"
 [ "$1" = "-help" ] && INVALID_ARGUMENTS=1 # Help option, error out.
 for i in $@; do
     [ "$ARG_TYPE" = "file" ] && FILENAME="$i" && ARG_TYPE="option"
-    [ "$i" = "-f" ] && ARG_TYPE="file"
-    [ "$i" = "-g" ] && OPTION="get"
-    [ "$i" = "-a" ] && OPTION="add"
-    [ "$i" = "-d" ] && OPTION="decrypt"
-    [ "$i" = "-c" ] && OPTION="encrypt"
+    [ "$i" = "-g" ] && OPTION="get" && ARG_TYPE="file"
+    [ "$i" = "-a" ] && OPTION="add" && ARG_TYPE="file"
+    [ "$i" = "-d" ] && OPTION="decrypt" && ARG_TYPE="file"
+    [ "$i" = "-c" ] && OPTION="encrypt" && ARG_TYPE="file"
 done
 # Print the help message if arguments are invalid:
 [ "$OPTION"   = "" ] && INVALID_ARGUMENTS=1

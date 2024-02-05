@@ -14,12 +14,12 @@ Install:
 
 Add a password:
     # Opens menu for adding a new section to a password file:
-    # (will create 'filename' if it does not yet exist)
-    tpv -a -f filename
+    # (will create '<filename>' if it does not yet exist)
+    tpv -a <filename>
 
 Get a password:
     # Opens menu for copying the a desired password:
-    tpv -g -f filename
+    tpv -g <filename>
 
 
 Format of the encrypted file:
@@ -38,11 +38,11 @@ Format of the encrypted file:
 
 To add/edit many passwords quickly:
     # You can decrypt the whole thing:
-    tpv -d -f filename
+    tpv -d <filename>
 
     # Edit the file with a text editor or your choice:
-    $EDITOR filename
+    $EDITOR <filename>
 
     # Encrypt the file again:
-    tpv -c -f filename
+    tpv -c <filename>
 
